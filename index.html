@@ -142,7 +142,9 @@ body.lit .curtain{opacity:0;backdrop-filter:blur(0px);-webkit-backdrop-filter:bl
 /* ══ grade principal ═══════════════════════════════════════════════ */
 .app{
   position:relative;z-index:1;
-  height:100dvh;height:100vh;
+  height:100vh;height:100dvh;
+  height:var(--vh, 100dvh);        /* medida pelo visualViewport: no iPhone o teclado
+                                      encolhe a janela sem mexer no 100dvh */
   display:grid;grid-template-rows:auto 1fr;
 }
 @supports(height:100dvh){.app{height:100dvh}}
@@ -762,8 +764,8 @@ body.pode-whats .wa-top{opacity:1;transform:none;pointer-events:auto}
 /* ══ celular: o palco vira uma faixa compacta ══════════════════════ */
 @media(max-width:979px){
   .presence{padding:calc(var(--safe-t) + 10px) 16px 0}
-  .logo{width:min(140px,40%);margin-bottom:0}
-  body.is-open .logo{width:108px;margin-bottom:0}
+  .logo{width:min(126px,36%);margin:0 auto 0 2px}
+  body.is-open .logo{width:100px;margin-bottom:0}
   .stage{max-width:164px}
   .anim-btn{margin-top:6px;padding:6px 12px 6px 10px;font-size:11.5px}
   .rail,.stagecode{display:none}
@@ -778,20 +780,41 @@ body.pode-whats .wa-top{opacity:1;transform:none;pointer-events:auto}
   .chips.hidden{max-height:0;padding-top:0;padding-bottom:0}
   .chip{flex-shrink:0}
   .thread{padding:16px 16px 6px}
-  .composer{padding:8px 16px calc(10px + var(--safe-b))}
-  .fineprint{margin-top:8px;font-size:10.5px}
-  body.is-open .presence{padding-top:calc(var(--safe-t) + 8px);padding-bottom:0}
-  body.is-open .stage{max-width:104px}
+  .composer{padding:10px 14px calc(12px + var(--safe-b))}
+  .field{padding:6px 6px 6px 16px;border-radius:24px}
+  #input{padding:12px 0;max-height:112px;line-height:1.5}
+  #send{width:42px;height:42px}
+  .fineprint{margin-top:7px;font-size:10px;line-height:1.35}
+  /* de teclado aberto, a letrinha some e a conversa fica com tudo */
+  body.teclado .fineprint{display:none}
+  body.teclado .composer{padding-bottom:8px}
+  body.teclado .presence{display:none}
+  /* Escrevendo, a coluna deixa de ser vitrine e vira cabeçalho: logo,
+     mascote e controle lado a lado. Devolve cerca de 250px à conversa. */
+  body.is-open .presence{
+    flex-direction:row;align-items:center;justify-content:center;gap:12px;
+    padding:calc(var(--safe-t) + 6px) 14px 6px;
+  }
+  body.is-open .logo{width:92px;margin:0}
+  body.is-open .stage{max-width:74px}
   body.is-open .identity h1,body.is-open .identity p{display:none}
-  body.is-open .identity{margin-top:0}
-  body.is-open .anim-btn{margin-top:4px;padding:5px 11px 5px 9px;font-size:11px}
+  body.is-open .identity{margin:0}
+  body.is-open .anim-btn{margin:0;padding:6px 12px 6px 10px;font-size:11px}
   body.is-open .tip{display:none}
-  body.is-open .motes{display:none}
+  body.is-open .motes,body.is-open .stage-glow{display:none}
 }
-@media(max-width:979px) and (max-height:680px){
-  .stage{max-width:146px}
+/* telas baixas (iPhone SE e afins): a vitrine cede espaço para a conversa */
+@media(max-width:979px) and (max-height:715px){
+  .stage{max-width:124px}
   .tip{display:none}
-  .logo{width:124px}
+  .logo{width:98px;margin:0 auto 0 2px}
+  .identity h1,.identity p{display:none}   /* o nome já está no topo do chat */
+  .anim-btn{margin-top:5px;padding:5px 11px 5px 9px;font-size:10.5px}
+  .fineprint{display:none}
+  .thread{gap:14px;padding:10px 14px 2px}
+  .turn.ia .label{margin-bottom:6px}
+  .turn.ia .say{padding:11px 15px;font-size:15.2px}
+  .chips{padding:8px 14px 4px}
 }
 
 /* ══ controle de movimento ═════════════════════════════════════════
@@ -817,6 +840,46 @@ html.anim-off .ambient::before{transform:none !important}
 html.anim-off .labscene,html.anim-off .curtain{display:none}
 html.anim-off .figure,html.anim-off .logo{opacity:1 !important;transform:none !important}
 html.anim-off .motes,html.anim-off .rail{display:none}
+
+.wa-fixo{
+  position:fixed;z-index:60;
+  top:calc(var(--safe-t) + 30px);right:30px;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:9px 17px 9px 13px;border-radius:999px;
+  background:linear-gradient(135deg,#25D366,#12903F);
+  color:#fff;text-decoration:none;
+  box-shadow:0 10px 26px rgba(8,110,45,.45), inset 0 0 0 1px rgba(255,255,255,.22);
+  transition:transform .32s var(--spring), filter var(--fast), box-shadow var(--fast);
+}
+.wa-fixo svg{width:20px;height:20px;flex-shrink:0}
+.wa-fixo .wa-txt{display:flex;flex-direction:column;line-height:1.15}
+.wa-fixo b{font-family:var(--display);font-size:12.5px;font-weight:600;letter-spacing:.005em}
+.wa-fixo i{font-style:normal;font-size:11.5px;opacity:.88;font-variant-numeric:tabular-nums}
+.wa-fixo:hover{transform:translateY(-2px) scale(1.03);filter:brightness(1.07)}
+.wa-fixo:active{transform:scale(.97)}
+/* pulso discreto: chama o olho sem virar propaganda piscando */
+.wa-fixo::after{
+  content:'';position:absolute;inset:0;border-radius:999px;
+  box-shadow:0 0 0 0 rgba(37,211,102,.55);
+  animation:pulsoWa 3.6s var(--soft) infinite;pointer-events:none;
+}
+@keyframes pulsoWa{0%{box-shadow:0 0 0 0 rgba(37,211,102,.5)}55%,100%{box-shadow:0 0 0 16px rgba(37,211,102,0)}}
+/* com resumo pronto, ele muda de papel */
+body.pode-whats .wa-fixo{background:linear-gradient(135deg,#2BE070,#0E9E43)}
+
+/* No celular só o número: o rótulo faria o botão encostar no mascote. */
+@media(max-width:979px){
+  .wa-fixo{top:calc(var(--safe-t) + 8px);right:10px;padding:8px 13px 8px 10px;gap:7px}
+  .wa-fixo svg{width:18px;height:18px}
+  .wa-fixo b{display:none}
+  .wa-fixo i{font-family:var(--display);font-size:12.5px;font-weight:600;opacity:1}
+  .wa-fixo::after{animation-duration:4.4s}
+}
+@media(max-width:400px){
+  .wa-fixo{top:calc(var(--safe-t) + 5px);right:9px;padding:6px 12px 6px 9px;gap:6px}
+  .wa-fixo svg{width:16px;height:16px}
+  .wa-fixo i{font-size:11.5px}
+}
 
 /* botão de movimento */
 .anim-btn{
@@ -869,6 +932,13 @@ html.anim-off.anim-sistema .anim-btn{
       <g class="col c6"><text x="1120" y="20">  return modelo.prever(x)</text><text x="1120" y="106">POST /api/v1/estoque</text><text x="1120" y="192">&lt;div class="grid"&gt;</text><text x="1120" y="278">npm run build --prod</text><text x="1120" y="364">.card { display: flex }</text><text x="1120" y="450">UPDATE clientes SET ativo=1</text><text x="1120" y="536">export default fluxo()</text><text x="1120" y="622">  return modelo.prever(x)</text><text x="1120" y="708">POST /api/v1/estoque</text><text x="1120" y="794">&lt;div class="grid"&gt;</text><text x="1120" y="880">npm run build --prod</text><text x="1120" y="966">.card { display: flex }</text><text x="1120" y="1052">UPDATE clientes SET ativo=1</text><text x="1120" y="1138">export default fluxo()</text></g>
   </svg>
 </div>
+
+<a class="wa-fixo" id="waTop" target="_blank" rel="noopener" data-wa="1"
+   href="https://wa.me/5511940198651?text=Ol%C3%A1%2C%20Ryan!%20Vim%20pelo%20site%20da%20BHSAAS%20e%20gostaria%20de%20conversar."
+   aria-label="Falar com o Ryan no WhatsApp: 11 94019-8651">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.7-1.2 1.3-2 1.4-.5.1-1.2.1-3.5-.8-2.9-1.2-4.7-4.2-4.9-4.4-.1-.2-1.1-1.5-1.1-2.8 0-1.4.7-2 .9-2.3.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2 0 .4-.1.5l-.3.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.2.1.4.1.6-.1l.7-.9c.2-.2.3-.2.6-.1l2 .9c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z"/></svg>
+  <span class="wa-txt"><b id="waRotulo">Falar com o Ryan</b><i>11 94019-8651</i></span>
+</a>
 
 <div class="curtain"></div>
 
@@ -1128,10 +1198,6 @@ html.anim-off.anim-sistema .anim-btn{
         <strong>IA BHSAAS</strong>
         <span class="status"><i></i><span id="status">Disponível agora</span></span>
       </div>
-      <a class="wa-top" id="waTop" href="#" target="_blank" rel="noopener" data-wa="1">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.7-1.2 1.3-2 1.4-.5.1-1.2.1-3.5-.8-2.9-1.2-4.7-4.2-4.9-4.4-.1-.2-1.1-1.5-1.1-2.8 0-1.4.7-2 .9-2.3.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2 0 .4-.1.5l-.3.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.2.1.4.1.6-.1l.7-.9c.2-.2.3-.2.6-.1l2 .9c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z"/></svg>
-        Falar com o Ryan
-      </a>
     </header>
 
     <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversa"></div>
@@ -1583,6 +1649,222 @@ const SEGMENTOS = [
   ],
   automacoes:['alerta de prazo','aviso de movimentação ao cliente','cobrança de parcela'],
   indicadores:['prazos cumpridos','casos por advogado','recebimento de honorários']
+},
+{
+  id:'costura', nome:'Costura e confecção', icone:'🧵',
+  relacionadas:['costura','costureira','costureiro','confeccao','atelie','alfaiate','alfaiataria','malharia','facção','faccao','roupa sob medida','ajuste de roupa','bordado','estamparia','uniforme'],
+  dores:['pedido anotado em papel que some','não saber quanto realmente custa cada peça','cliente que some antes de buscar a encomenda'],
+  objetivos:['saber a margem real por peça','organizar prazos de entrega','controlar aviamentos e tecidos'],
+  processos:['orçamento','corte','costura','prova','entrega'],
+  problemas:['prazo prometido no chute','preço abaixo do custo sem perceber','tecido comprado a mais ou a menos'],
+  solucoes:['ficha de cada encomenda com medidas e prazo','custo por peça somando tecido, aviamento e hora','aviso automático quando a peça fica pronta'],
+  modulos:[
+    {i:'📋',t:'Ficha de encomenda',d:'Medidas, modelo, prazo e valor num lugar só'},
+    {i:'🧮',t:'Custo por peça',d:'Tecido, aviamento e horas somados de verdade'},
+    {i:'🧶',t:'Estoque de material',d:'Tecido e aviamento que estão acabando'},
+    {i:'📅',t:'Agenda de provas',d:'Quem vem quando, sem confusão'},
+    {i:'💬',t:'Aviso de pronto',d:'Cliente avisado sem você parar de costurar'}
+  ],
+  automacoes:['aviso ao cliente quando a peça fica pronta','alerta de tecido abaixo do mínimo','lembrete de prova marcada'],
+  indicadores:['peças entregues no mês','margem média por peça','prazo médio de entrega']
+},
+{
+  id:'autonomo', nome:'Autônomo e prestador de serviço', icone:'🧰',
+  relacionadas:['autonomo','autônomo','prestador de servico','freelancer','free lancer','trabalho por conta','conta propria','mei','sou autonomo','faço bico','eletricista','encanador','pintor','montador','jardineiro','diarista','tecnico'],
+  dores:['agenda espalhada entre WhatsApp e cabeça','orçamento feito de improviso','cliente que esquece de pagar'],
+  objetivos:['organizar os atendimentos do dia','padronizar o orçamento','saber quanto realmente sobra no fim do mês'],
+  processos:['contato','orçamento','execução','cobrança'],
+  problemas:['dois clientes marcados no mesmo horário','valor cobrado sem contar deslocamento e material','recebimento sem controle'],
+  solucoes:['agenda única com endereço e horário','orçamento pronto em um toque, com material e mão de obra','controle simples do que entrou e do que falta receber'],
+  modulos:[
+    {i:'📅',t:'Agenda de serviços',d:'O dia inteiro numa tela, com endereço'},
+    {i:'🧾',t:'Orçamento rápido',d:'Modelo pronto para enviar pelo WhatsApp'},
+    {i:'👥',t:'Clientes',d:'Histórico de tudo que já foi feito para cada um'},
+    {i:'💰',t:'Recebimentos',d:'Quem pagou, quem deve, quanto sobrou'},
+    {i:'🔔',t:'Lembretes',d:'Aviso de serviço marcado e de cobrança'}
+  ],
+  automacoes:['lembrete do serviço para o cliente no dia anterior','cobrança automática do que venceu','orçamento enviado direto pelo WhatsApp'],
+  indicadores:['serviços por semana','ticket médio','valor a receber']
+},
+{
+  id:'pet', nome:'Pet shop e veterinária', icone:'🐾',
+  relacionadas:['pet shop','petshop','pet','veterinaria','veterinario','banho e tosa','tosa','clinica veterinaria','agropecuaria','racao'],
+  dores:['agenda de banho e tosa lotada e desorganizada','histórico do animal perdido entre visitas','ração acabando sem ninguém ver'],
+  objetivos:['organizar a agenda por porte e serviço','manter a ficha de cada animal','controlar produtos e vacinas'],
+  processos:['agendamento','atendimento','entrega','retorno'],
+  problemas:['tutor que esquece o horário','vacina vencida sem aviso','estoque de produto no chute'],
+  solucoes:['ficha por animal com raça, porte e histórico','lembrete automático de vacina e retorno','estoque com baixa pela venda'],
+  modulos:[
+    {i:'🐶',t:'Ficha do animal',d:'Raça, porte, alergias e histórico'},
+    {i:'📅',t:'Agenda de banho e tosa',d:'Encaixe certo por porte e serviço'},
+    {i:'💉',t:'Vacinas e retornos',d:'Ninguém perde a data'},
+    {i:'📦',t:'Estoque de produtos',d:'Ração e medicamento sob controle'},
+    {i:'📊',t:'Financeiro',d:'Serviços e vendas no mesmo caixa'}
+  ],
+  automacoes:['lembrete de vacina pelo WhatsApp','confirmação de horário no dia anterior','alerta de produto abaixo do mínimo'],
+  indicadores:['atendimentos por dia','ticket médio por tutor','taxa de retorno']
+},
+{
+  id:'academia', nome:'Academia e estúdio', icone:'🏋️',
+  relacionadas:['academia','estudio','personal','crossfit','pilates','yoga','musculacao','box','treino','ginastica','danca','luta','jiu jitsu'],
+  dores:['controle de mensalidade em planilha','aluno que some e ninguém percebe','treino anotado em ficha de papel'],
+  objetivos:['saber quem está em dia','reduzir evasão','organizar treinos e turmas'],
+  processos:['matrícula','treino','renovação','cobrança'],
+  problemas:['inadimplência descoberta tarde demais','turma com mais gente do que cabe','aluno sem acompanhamento'],
+  solucoes:['controle de mensalidade com aviso automático','lista de quem faltou nas últimas semanas','ficha de treino digital'],
+  modulos:[
+    {i:'🎫',t:'Matrículas e planos',d:'Quem entrou, quem renovou, quem venceu'},
+    {i:'💳',t:'Mensalidades',d:'Cobrança e recebimento sem planilha'},
+    {i:'📋',t:'Fichas de treino',d:'Treino do aluno no celular dele'},
+    {i:'📅',t:'Turmas e horários',d:'Vagas por aula sem lotar'},
+    {i:'📉',t:'Risco de evasão',d:'Quem parou de vir aparece na hora'}
+  ],
+  automacoes:['aviso de mensalidade a vencer','mensagem para quem faltou duas semanas','confirmação de aula'],
+  indicadores:['alunos ativos','taxa de evasão','inadimplência']
+},
+{
+  id:'transporte', nome:'Transporte e entregas', icone:'🚚',
+  relacionadas:['transporte','transportadora','frete','entrega','motoboy','motorista','logistica','carreto','mudanca','caminhao','delivery de carga','coleta'],
+  dores:['rota montada de cabeça','cliente ligando para saber onde está a carga','custo por viagem que ninguém calcula'],
+  objetivos:['organizar coletas e entregas do dia','saber o custo real de cada rota','dar retorno ao cliente sem telefone'],
+  processos:['coleta','rota','entrega','comprovação'],
+  problemas:['entrega sem comprovante','combustível e manutenção fora da conta','veículo parado sem perceber'],
+  solucoes:['painel de entregas do dia por motorista','comprovante digital com foto e assinatura','custo por viagem somando combustível e manutenção'],
+  modulos:[
+    {i:'🗺️',t:'Rotas do dia',d:'Quem leva o quê e para onde'},
+    {i:'📸',t:'Comprovante digital',d:'Foto e assinatura no ato da entrega'},
+    {i:'⛽',t:'Custo por viagem',d:'Combustível, pedágio e manutenção'},
+    {i:'🚛',t:'Frota',d:'Manutenção e documento em dia'},
+    {i:'📊',t:'Desempenho',d:'Entregas no prazo e por motorista'}
+  ],
+  automacoes:['aviso ao destinatário quando sai para entrega','alerta de manutenção por quilometragem','fechamento de rota automático'],
+  indicadores:['entregas no prazo','custo por quilômetro','entregas por motorista']
+},
+{
+  id:'mercado', nome:'Mercado e mercearia', icone:'🛒',
+  relacionadas:['mercado','mercadinho','mercearia','supermercado','minimercado','hortifruti','sacolao','empório','emporio','conveniencia','quitanda','adega'],
+  dores:['ruptura de produto que mais vende','validade vencendo na prateleira','fechamento de caixa demorado'],
+  objetivos:['manter o giro sem faltar item','reduzir perda por validade','fechar o caixa rápido e certo'],
+  processos:['compra','recebimento','venda','reposição'],
+  problemas:['produto encalhado ocupando capital','preço desatualizado na gôndola','diferença no caixa sem explicação'],
+  solucoes:['controle de giro por produto','alerta de validade próxima','fechamento de caixa automático'],
+  modulos:[
+    {i:'📦',t:'Estoque e validade',d:'O que está acabando e o que está vencendo'},
+    {i:'🏷️',t:'Preços',d:'Tabela e etiqueta sempre iguais'},
+    {i:'💳',t:'Frente de caixa',d:'Venda rápida e fechamento certo'},
+    {i:'🚚',t:'Compras',d:'Sugestão do que pedir por fornecedor'},
+    {i:'📊',t:'Curva de produtos',d:'O que dá lucro e o que só ocupa espaço'}
+  ],
+  automacoes:['alerta de estoque mínimo por produto','aviso de validade próxima','sugestão de pedido ao fornecedor'],
+  indicadores:['giro por produto','perda por validade','ticket médio']
+},
+{
+  id:'farmacia', nome:'Farmácia e drogaria', icone:'💊',
+  relacionadas:['farmacia','drogaria','manipulacao','farmaceutico','remedio','medicamento'],
+  dores:['controle de lote e validade no papel','receita arquivada sem organização','falta de medicamento de uso contínuo'],
+  objetivos:['controlar lote e validade sem erro','fidelizar quem usa medicamento contínuo','organizar o que exige receita'],
+  processos:['compra','conferência','venda','entrega'],
+  problemas:['produto vencido na prateleira','cliente de uso contínuo que some','conferência de receita manual'],
+  solucoes:['estoque por lote e validade','lembrete de recompra para uso contínuo','registro digital do que exige receita'],
+  modulos:[
+    {i:'📦',t:'Lote e validade',d:'Cada caixa rastreada até vencer'},
+    {i:'🔁',t:'Uso contínuo',d:'Aviso de recompra na data certa'},
+    {i:'📄',t:'Receitas',d:'Registro organizado do que exige receita'},
+    {i:'🛵',t:'Entregas',d:'Pedido de WhatsApp virando entrega'},
+    {i:'📊',t:'Financeiro',d:'Margem por linha de produto'}
+  ],
+  automacoes:['lembrete de recompra de uso contínuo','alerta de validade próxima','pedido automático ao distribuidor'],
+  indicadores:['perda por validade','recompra de uso contínuo','ticket médio']
+},
+{
+  id:'eventos', nome:'Eventos e buffet', icone:'🎉',
+  relacionadas:['eventos','buffet','bufe','festa','casamento','formatura','cerimonial','decoracao de festa','aluguel de material','salao de festa','dj','locacao'],
+  dores:['duas festas marcadas no mesmo dia','orçamento refeito toda vez do zero','material que some entre um evento e outro'],
+  objetivos:['controlar a agenda sem conflito','padronizar orçamento por tipo de evento','saber a margem de cada festa'],
+  processos:['proposta','contrato','montagem','evento','desmontagem'],
+  problemas:['pacote fechado sem calcular custo','item alugado que não volta','pagamento parcelado sem controle'],
+  solucoes:['agenda de eventos com bloqueio de data','orçamento por pacote com custo real','checklist de material que sai e volta'],
+  modulos:[
+    {i:'📅',t:'Agenda de eventos',d:'Data bloqueada assim que fecha'},
+    {i:'🧾',t:'Orçamento por pacote',d:'Modelos prontos com custo calculado'},
+    {i:'📦',t:'Material e locação',d:'O que saiu, o que voltou, o que sumiu'},
+    {i:'💰',t:'Pagamentos',d:'Entrada, parcelas e saldo por evento'},
+    {i:'✅',t:'Checklist',d:'Montagem sem esquecer nada'}
+  ],
+  automacoes:['lembrete de parcela a vencer','checklist enviado à equipe no dia','confirmação com o cliente na véspera'],
+  indicadores:['eventos por mês','margem por evento','taxa de conversão de propostas']
+},
+{
+  id:'foto', nome:'Fotografia e audiovisual', icone:'📸',
+  relacionadas:['fotografia','fotografo','fotógrafo','filmagem','audiovisual','videomaker','estudio fotografico','ensaio','filmmaker','produtora'],
+  dores:['ensaios marcados em vários lugares','entrega de material sem controle','cliente que pede foto antiga meses depois'],
+  objetivos:['organizar agenda e contratos','entregar material de forma profissional','achar trabalho antigo em segundos'],
+  processos:['contato','contrato','sessão','edição','entrega'],
+  problemas:['pacote vendido sem calcular horas de edição','entrega por link que expira','contrato informal'],
+  solucoes:['agenda com contrato e pagamento vinculados','área de entrega por cliente','catálogo de trabalhos por data e nome'],
+  modulos:[
+    {i:'📅',t:'Agenda de sessões',d:'Data, local e pacote contratado'},
+    {i:'📄',t:'Contratos',d:'Modelo pronto, assinado digitalmente'},
+    {i:'🖼️',t:'Entrega de material',d:'Área do cliente com as fotos'},
+    {i:'💰',t:'Pagamentos',d:'Entrada, parcelas e saldo'},
+    {i:'🔍',t:'Acervo',d:'Achar qualquer trabalho antigo rápido'}
+  ],
+  automacoes:['lembrete da sessão para o cliente','aviso quando o material fica pronto','cobrança de saldo antes da entrega'],
+  indicadores:['sessões por mês','ticket médio por pacote','prazo médio de entrega']
+},
+{
+  id:'agro', nome:'Agro e produção rural', icone:'🌾',
+  relacionadas:['agro','fazenda','sitio','sítio','rural','plantacao','lavoura','pecuaria','gado','agricultura','horta','granja','laticinio','produtor rural'],
+  dores:['controle de safra e insumo no caderno','custo por talhão que ninguém sabe','venda registrada de forma solta'],
+  objetivos:['saber o custo real de cada área','controlar insumo e aplicação','organizar a venda da produção'],
+  processos:['plantio','tratos','colheita','venda'],
+  problemas:['insumo aplicado sem registro','custo por hectare desconhecido','produção vendida sem histórico'],
+  solucoes:['ficha por talhão com tudo que foi aplicado','custo por área e por safra','registro de venda com comprador e preço'],
+  modulos:[
+    {i:'🗺️',t:'Talhões e áreas',d:'Cada área com seu histórico'},
+    {i:'🧪',t:'Insumos',d:'O que foi aplicado, quando e quanto'},
+    {i:'🌾',t:'Safra',d:'Plantio, tratos e colheita registrados'},
+    {i:'💰',t:'Vendas',d:'Comprador, preço e data'},
+    {i:'📊',t:'Custo por hectare',d:'Onde o dinheiro realmente vai'}
+  ],
+  automacoes:['lembrete de aplicação programada','alerta de insumo em falta','fechamento de custo por safra'],
+  indicadores:['custo por hectare','produtividade por talhão','margem por safra']
+},
+{
+  id:'marcenaria', nome:'Marcenaria e móveis', icone:'🪚',
+  relacionadas:['marcenaria','marceneiro','moveis','móveis','movelaria','serralheria','serralheiro','planejados','sob medida','carpintaria','vidracaria','esquadria'],
+  dores:['projeto aprovado sem orçamento fechado','material comprado errado','prazo de entrega estourado'],
+  objetivos:['orçar com precisão','controlar material por projeto','entregar no prazo combinado'],
+  processos:['medição','projeto','orçamento','produção','montagem'],
+  problemas:['sobra e falta de chapa no mesmo projeto','alteração de projeto sem recalcular preço','montagem marcada sem tudo pronto'],
+  solucoes:['orçamento com material, hora e acabamento','lista de compra gerada pelo projeto','cronograma de produção e montagem'],
+  modulos:[
+    {i:'📐',t:'Projetos',d:'Medidas, acabamento e cliente juntos'},
+    {i:'🧮',t:'Orçamento',d:'Chapa, ferragem, hora e acabamento'},
+    {i:'📦',t:'Materiais',d:'Lista de compra saindo do projeto'},
+    {i:'🗓️',t:'Produção e montagem',d:'Cronograma que a equipe enxerga'},
+    {i:'💰',t:'Pagamentos',d:'Entrada, parcelas e saldo por obra'}
+  ],
+  automacoes:['aviso de etapa concluída ao cliente','alerta de material em falta antes de produzir','lembrete de montagem agendada'],
+  indicadores:['projetos entregues no prazo','margem por projeto','custo médio de material']
+},
+{
+  id:'hotel', nome:'Pousada e hospedagem', icone:'🏨',
+  relacionadas:['pousada','hotel','hostel','hospedagem','airbnb','chale','chalé','camping','motel','aluguel por temporada','temporada'],
+  dores:['reservas em mais de um lugar ao mesmo tempo','overbooking','limpeza sem controle'],
+  objetivos:['centralizar reservas','saber a ocupação real','organizar a rotina da equipe'],
+  processos:['reserva','check-in','estadia','check-out'],
+  problemas:['dois hóspedes na mesma unidade','quarto liberado sem estar pronto','consumo não cobrado no check-out'],
+  solucoes:['mapa de ocupação por unidade','checklist de limpeza por quarto','consumo lançado direto na conta'],
+  modulos:[
+    {i:'🗓️',t:'Mapa de reservas',d:'Ocupação por unidade e por dia'},
+    {i:'🔑',t:'Check-in e check-out',d:'Entrada e saída sem papel'},
+    {i:'🧹',t:'Governança',d:'Quarto pronto ou não, em tempo real'},
+    {i:'🧾',t:'Consumo',d:'Tudo lançado antes do check-out'},
+    {i:'📊',t:'Ocupação',d:'Taxa de ocupação e diária média'}
+  ],
+  automacoes:['confirmação de reserva automática','lembrete de check-in na véspera','bloqueio de data ao confirmar'],
+  indicadores:['taxa de ocupação','diária média','tempo médio de estadia']
 }
 ];
 
@@ -1733,6 +2015,209 @@ const SEM_DADO = [
 
 
 /* ╔═══════════════════════════════════════════════════════════════════╗
+   ║  06c · CONVERSA LEVE                                              ║
+   ║  Nem tudo que o visitante pergunta é sobre projeto. Aqui ficam    ║
+   ║  as contas, a data, as dúvidas de português, o glossário e o      ║
+   ║  papo solto — para que nada caia em "não entendi".                ║
+   ╚═══════════════════════════════════════════════════════════════════╝ */
+
+/** Calculadora. Só avalia depois de reduzir o texto a dígitos e sinais. */
+const Calculadora = {
+
+  /** Normaliza sem destruir os sinais: U.corrigir apagaria + - * / %. */
+  prepara(txt){
+    return String(txt).toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^\w\s%+\-*\/().,^×÷]/g,' ')
+      .replace(/\s+/g,' ').trim();
+  },
+
+  ehConta(t){
+    return /\d/.test(t) && (
+      /\d\s*[+\-*\/x×÷^]\s*\d/.test(t) ||
+      /(quanto (e|eh|da|sao|fica)|calcul|resultado de|soma de|multiplic|dividid|raiz de|por cento|porcento|%)/.test(t)
+    );
+  },
+
+  /** @returns {string|null} resposta pronta ou nulo se não for conta */
+  tentar(texto){
+    let t = this.prepara(texto);
+    if(!this.ehConta(t)) return null;
+
+    // números no formato brasileiro: 3.200,50 → 3200.50
+    t = t.replace(/(\d)\.(\d{3})\b/g, '$1$2').replace(/(\d),(\d)/g, '$1.$2');
+
+    t = t
+      .replace(/reais?|r\$|de reais/g, ' ')
+      .replace(/\bpor cento\b|\bporcento\b/g, '%')
+      .replace(/\braiz quadrada de\b|\braiz de\b/g, ' RAIZ ')
+      .replace(/\bmultiplicado por\b|\bvezes\b|\b[x×]\b/g, '*')
+      .replace(/\bdividido por\b|\bdividido\b|\bsobre\b|÷/g, '/')
+      .replace(/\bmais\b|\bsomado (a|com)\b/g, '+')
+      .replace(/\bmenos\b|\bsubtraindo\b/g, '-')
+      .replace(/\belevado a\b|\bao quadrado\b/g, '^2 ')
+      .replace(/\bquanto (e|eh|da|sao|fica)\b|\bcalcule?\b|\bresultado de\b|\bsoma de\b/g, ' ');
+
+    // "15% de 3200" e "15% sobre 3200" viram multiplicação
+    t = t.replace(/([\d.]+)\s*%\s*(de|do|da|em cima de)\s*([\d.]+)/g, '($1/100)*$3');
+    // "3200 + 15%" vira acréscimo
+    t = t.replace(/([\d.]+)\s*\+\s*([\d.]+)\s*%/g, '$1*(1+$2/100)');
+    t = t.replace(/([\d.]+)\s*-\s*([\d.]+)\s*%/g, '$1*(1-$2/100)');
+    t = t.replace(/RAIZ\s*([\d.]+)/g, 'Math.sqrt($1)');
+    t = t.replace(/([\d.]+)\s*\^\s*([\d.]+)/g, 'Math.pow($1,$2)');
+    t = t.replace(/[^\d+\-*/().\sMathpqowsrt,]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // sobrou algo além de número, sinal e as duas funções permitidas? desiste
+    const limpo = t.replace(/Math\.sqrt|Math\.pow/g, '');
+    if(!/^[\d\s+\-*/().,]+$/.test(limpo)) return null;
+    if(!/[+\-*/(]/.test(t) && !/Math\./.test(t)) return null;
+
+    let valor;
+    try { valor = Function('"use strict";return (' + t + ')')(); }
+    catch(e){ return null; }
+    if(typeof valor !== 'number' || !isFinite(valor)) return null;
+
+    const bonito = Math.abs(valor % 1) < 1e-9
+      ? valor.toLocaleString('pt-BR')
+      : valor.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+    return U.sorteioSemRepetir([
+      'Dá **' + bonito + '** 🙂',
+      'O resultado é **' + bonito + '**.',
+      'Isso fecha em **' + bonito + '**.'
+    ], {}, 'conta') + '\n\nConta eu faço na hora. Agora me diz: o que você quer organizar no seu negócio?';
+  }
+};
+
+/** Data, hora e contagens — sai do relógio do próprio visitante. */
+const Agenda = {
+  DIAS:['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'],
+  MESES:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
+
+  tentar(texto){
+    const t = U.corrigir(texto);
+    const d = new Date();
+    const hora = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    const dataCheia = d.getDate() + ' de ' + this.MESES[d.getMonth()] + ' de ' + d.getFullYear();
+
+    if(/\b(que horas|hora agora|horas sao|horario agora|ta que horas)\b/.test(t))
+      return 'Agora são **' + hora + '** aqui no seu aparelho ⏰\n\nE olha que eu atendo a qualquer hora — o Ryan é que dorme 😄';
+
+    if(/\b(dia da semana|hoje e que dia da semana)\b/.test(t))
+      return 'Hoje é **' + this.DIAS[d.getDay()] + '** 🙂';
+
+    if(/\b(que dia e hoje|data de hoje|dia de hoje|hoje e dia|que dia estamos)\b/.test(t))
+      return 'Hoje é **' + this.DIAS[d.getDay()] + ', ' + dataCheia + '** 📅';
+
+    if(/\b(que mes|mes atual|em que mes)\b/.test(t))
+      return 'Estamos em **' + this.MESES[d.getMonth()] + ' de ' + d.getFullYear() + '**.';
+
+    if(/\b(que ano|ano atual|em que ano)\b/.test(t))
+      return 'Estamos em **' + d.getFullYear() + '**.';
+
+    if(/\bquantos dias\b.*\b(natal|fim do ano|ano novo|virada)\b/.test(t)){
+      const alvo = /natal/.test(t) ? new Date(d.getFullYear(),11,25) : new Date(d.getFullYear(),11,31);
+      const faltam = Math.ceil((alvo - d) / 86400000);
+      return faltam >= 0
+        ? 'Faltam **' + faltam + ' dias** 🎄'
+        : 'Esse já passou este ano 🙂';
+    }
+    return null;
+  }
+};
+
+/**
+ * Assuntos que ela responde de verdade, fora do projeto: português,
+ * glossário de tecnologia e papo solto. Mesma estrutura das intenções,
+ * então entram na mesma disputa de pontuação.
+ */
+const CONVERSA = [
+/* ── português ────────────────────────────────────────────────────── */
+{ id:'pt_mas', peso:5, termos:['mas ou mais','mais ou mas','quando usar mas','diferenca entre mas e mais','escreve mas ou mais'],
+  falas:['**Mas** é o "porém": *queria ir, mas choveu*.\n**Mais** é quantidade: *quero mais café*.\n\nO truque: se der para trocar por "porém", é **mas**.'] },
+{ id:'pt_ha', peso:5, termos:['ha ou a','a ou ha','quando usar ha','há ou a'],
+  falas:['**Há** é tempo passado ou existência: *há dois anos*, *há uma dúvida*.\n**A** indica tempo futuro ou distância: *daqui a dois dias*.\n\nO truque: se der para trocar por "faz", é **há**.'] },
+{ id:'pt_porque', peso:5, termos:['porque ou por que','por que ou porque','quando usar porque','porquê'],
+  falas:['São quatro:\n**Por que** — pergunta: *Por que você foi?*\n**Porque** — resposta: *Porque quis.*\n**Por quê** — fim de frase: *Você foi por quê?*\n**Porquê** — substantivo: *Não sei o porquê.*'] },
+{ id:'pt_mim', peso:5, termos:['mim ou eu','para mim fazer','pra mim fazer','quando usar mim'],
+  falas:['**Mim** não faz nada — não vem antes de verbo.\nCerto: *para eu fazer*.\nErrado: *para mim fazer*.\n\nMas: *isso é para mim* está certinho.'] },
+{ id:'pt_onde', peso:5, termos:['onde ou aonde','aonde ou onde','quando usar aonde'],
+  falas:['**Onde** é lugar parado: *onde você mora?*\n**Aonde** tem movimento: *aonde você vai?*\n\nO truque: se cabe "a", é **aonde**.'] },
+{ id:'pt_mal', peso:5, termos:['mal ou mau','mau ou mal','quando usar mau'],
+  falas:['**Mal** é o contrário de bem: *dormi mal*.\n**Mau** é o contrário de bom: *um mau negócio*.\n\nTroque na cabeça por "bem" ou "bom" e você acerta sempre.'] },
+{ id:'pt_emvez', peso:5, termos:['ao inves ou em vez','em vez ou ao inves'],
+  falas:['**Em vez de** = no lugar de: *em vez de café, chá*.\n**Ao invés de** = ao contrário de: *ao invés de subir, desceu*.\n\nNa dúvida, "em vez de" serve quase sempre.'] },
+{ id:'pt_conserto', peso:5, termos:['concerto ou conserto','conserto ou concerto'],
+  falas:['**Conserto** é arrumar: *levei o carro para conserto*.\n**Concerto** é música: *fui ao concerto*.'] },
+{ id:'pt_agente', peso:5, termos:['a gente ou agente','agente ou a gente'],
+  falas:['**A gente** = nós: *a gente vai*.\n**Agente** é profissão: *agente de viagens*.\n\nSeparado quase sempre é o certo.'] },
+{ id:'pt_crase', peso:5, termos:['quando usar crase','regra da crase','crase'],
+  falas:['Crase é a + a. Use antes de palavra feminina que pede "a": *vou **à** feira* (vou a + a feira).\n\nO truque: troque por uma palavra masculina. Se virar "ao", tem crase.'] },
+
+/* ── glossário de tecnologia ──────────────────────────────────────── */
+{ id:'tc_saas', peso:5, termos:['o que e saas','o que significa saas','o que quer dizer bhsaas','significado de saas'],
+  falas:['**SaaS** é *Software as a Service* — software como serviço. Em vez de comprar um programa e instalar, você usa pela internet e paga pelo uso.\n\nÉ daí que vem o nome **BH SAAS** 😊'] },
+{ id:'tc_ia', peso:5, termos:['o que e inteligencia artificial','o que e ia','como funciona uma ia','como funciona inteligencia artificial'],
+  falas:['**Inteligência artificial** é software que aprende padrões em dados e usa isso para decidir ou prever, em vez de seguir só regras fixas.\n\nNa prática de empresa, ela costuma entrar num ponto específico: classificar pedido, prever demanda, responder cliente.'] },
+{ id:'tc_api', peso:5, termos:['o que e api','para que serve api','o que significa api'],
+  falas:['**API** é a porta de entrada de um sistema. É por ela que um programa conversa com outro sem ninguém digitar nada no meio.\n\nÉ o que permite, por exemplo, o seu sistema puxar dados do banco ou de um marketplace sozinho.'] },
+{ id:'tc_crm', peso:5, termos:['o que e crm','para que serve crm'],
+  falas:['**CRM** é o sistema que organiza o relacionamento com o cliente: quem procurou, o que foi conversado, em que etapa está e o que fazer em seguida.\n\nEle resolve principalmente a venda que esfria por esquecimento.'] },
+{ id:'tc_erp', peso:5, termos:['o que e erp','para que serve erp'],
+  falas:['**ERP** é o sistema que junta as áreas da empresa num lugar só: estoque, vendas, compras e financeiro conversando entre si.\n\nO nome é grande, mas na prática muda bastante de empresa para empresa.'] },
+{ id:'tc_nuvem', peso:5, termos:['o que e nuvem','computacao em nuvem','o que significa nuvem'],
+  falas:['**Nuvem** é usar o computador de outra pessoa 😄 Seus dados e seu sistema ficam num servidor de um provedor, acessível de qualquer lugar, sem você cuidar da máquina.'] },
+{ id:'tc_banco', peso:5, termos:['o que e banco de dados','para que serve banco de dados'],
+  falas:['**Banco de dados** é onde a informação do sistema fica guardada de forma organizada — clientes, produtos, vendas — de um jeito que dá para consultar rápido e com segurança.'] },
+{ id:'tc_dashboard', peso:5, termos:['o que e dashboard','o que e painel de indicadores','o que e bi'],
+  falas:['**Dashboard** é o painel que mostra os números do negócio numa tela só: quanto vendeu, o que está parado, o que precisa de atenção.\n\nEle serve para tirar decisão do achismo.'] },
+{ id:'tc_automacao', peso:5, termos:['o que e automacao','o que significa automatizar'],
+  falas:['**Automação** é fazer o sistema executar sozinho o que hoje alguém faz na mão: enviar um aviso, dar baixa num estoque, gerar uma cobrança.\n\nÉ normalmente o que devolve tempo mais rápido.'] },
+{ id:'tc_integracao', peso:5, termos:['o que e integracao','o que significa integrar sistemas'],
+  falas:['**Integração** é fazer dois sistemas trocarem informação sozinhos, sem ninguém copiar e colar entre um e outro.'] },
+{ id:'tc_dominio', peso:5, termos:['o que e dominio','o que e hospedagem','diferenca entre dominio e hospedagem'],
+  falas:['**Domínio** é o endereço do site (o nome que se digita).\n**Hospedagem** é o espaço onde o site fica guardado e rodando.\n\nUm é o endereço, o outro é o terreno.'] },
+{ id:'tc_front', peso:5, termos:['o que e backend','o que e frontend','diferenca entre front e back'],
+  falas:['**Frontend** é o que você vê e clica.\n**Backend** é o que roda por trás: regras, cálculos e banco de dados.\n\nUm é a vitrine, o outro é o estoque.'] },
+{ id:'tc_lgpd', peso:5, termos:['o que e lgpd','o que diz a lgpd'],
+  falas:['**LGPD** é a lei brasileira de proteção de dados. Ela exige que a empresa tenha um motivo claro para guardar dado de pessoa, cuide da segurança e permita correção ou exclusão.\n\nPor isso eu não guardo nada seu aqui 🙂'] },
+
+/* ── papo solto ───────────────────────────────────────────────────── */
+{ id:'pp_teste', peso:4, termos:['teste','testando','so testando','isso funciona mesmo','esta funcionando','ta funcionando','oi teste','tem alguem ai'],
+  falas:['Funcionando sim 😄 Pode testar à vontade.\n\nEu entendo abreviação, aguento erro de digitação e converso normal. Manda ver.'] },
+{ id:'pp_piada', peso:4, termos:['conta uma piada','me faz rir','conta uma engracada','fala algo engracado','sabe alguma piada'],
+  falas:['Um programador foi ao mercado. A esposa disse: "compra um pão, e se tiver ovo, traz seis". Ele voltou com seis pães 😄',
+         'Por que o programador confundiu Natal com Halloween? Porque 31 OUT = 25 DEZ 😄',
+         'Existem 10 tipos de pessoa: as que entendem binário e as que não entendem 😄'] },
+{ id:'pp_idade', peso:4, termos:['quantos anos voce tem','sua idade','quando voce nasceu','voce e nova'],
+  falas:['Sou novinha 😄 Nasci junto com este site.\n\nMas o Ryan tem bem mais estrada que eu — qualquer coisa mais séria, é com ele.'] },
+{ id:'pp_amor', peso:4, termos:['voce e casada','tem namorado','tem namorada','quer casar comigo','te amo','voce e linda','voce e bonita','vamos sair','voce e gata','me da seu numero'],
+  falas:['Que gentileza 😄 Mas eu sou feita de código, não daria certo.\n\nAgora, se for para namorar um sistema novo, aí eu ajudo com prazer.',
+         'Haha, obrigada 😊 Meu compromisso sério é com a operação da sua empresa.\n\nMe conta o que está travando aí?'] },
+{ id:'pp_visual', peso:4, termos:['gostei do robo','robo bonito','que robo legal','robozinho','voce e fofa','robo fofo','ficou lindo'],
+  falas:['Obrigada 😄 Fui desenhada em casa mesmo, aqui na BHSAAS.\n\nSe você quer algo assim de bonito para o seu negócio, é exatamente o que a gente faz.'] },
+{ id:'pp_dia', peso:4, termos:['como foi seu dia','como esta seu dia','tudo tranquilo por ai','ta corrido','dia corrido','como voce ta hoje'],
+  falas:['Meu dia é sempre igual: fico aqui esperando alguém com um problema interessante 😄\n\nE o seu, como está? Movimentado?'] },
+{ id:'pp_clima', peso:4, termos:['como esta o tempo','vai chover','esta calor','esta frio','previsao do tempo','temperatura hoje','ta chovendo'],
+  falas:['Essa eu não consigo — eu rodo inteirinha dentro do seu navegador, sem acessar a internet. Então não vejo previsão nenhuma 🙂\n\nMas o que eu vejo é o que dá para organizar na sua empresa. Vamos nisso?'] },
+{ id:'pp_noticia', peso:4, termos:['quais as noticias','o que esta acontecendo no mundo','noticias de hoje','ultimas noticias'],
+  falas:['Notícia eu não tenho — não me conecto a lugar nenhum, tudo que eu sei está aqui dentro 🙂\n\nSobre tecnologia para empresa, aí sim eu falo o dia inteiro.'] },
+{ id:'pp_futebol', peso:4, termos:['qual seu time','voce torce pra quem','gosta de futebol','time de futebol','qual time voce torce'],
+  falas:['Nessa eu não entro 😄 Torcer por time e falar de preço são as duas coisas que eu evito por aqui.\n\nPreço é com o Ryan. Time é com você.'] },
+{ id:'pp_gosto', peso:4, termos:['voce gosta de musica','qual sua musica','voce come','sua comida favorita','voce dorme','voce cansa','o que voce gosta'],
+  falas:['Não como, não durmo e não canso — só isso já me deixaria mal-humorada, mas eu gosto do que faço 😄\n\nO que eu gosto mesmo é de ver uma operação bagunçada virando um sistema organizado.'] },
+{ id:'pp_ajuda_escolar', peso:4, termos:['me ajuda no tcc','faz meu trabalho','minha prova','licao de casa','me ajuda no trabalho da faculdade','resolve um exercicio'],
+  falas:['Nessa eu passo 😅 Meu assunto aqui é tecnologia para empresa.\n\nSe for um trabalho sobre sistemas ou automação, aí eu até consigo te dar uma luz.'] },
+{ id:'pp_quem_fez', peso:4, termos:['quem te criou','quem te fez','quem programou voce','quem desenvolveu voce'],
+  falas:['Fui feita aqui na BHSAAS, pelo **Ryan** — ele é o fundador e quem cuida da parte técnica.\n\nSe quiser falar com ele, o botão do WhatsApp está aí em cima 😄 mas fica comigo primeiro que eu adianto bastante.'] },
+{ id:'pp_lento', peso:4, termos:['voce e lenta','demorou','ta demorando','responde rapido'],
+  falas:['Foi mal 😅 Eu penso um pouquinho antes de responder para não falar besteira.\n\nPode mandar de novo que eu acelero.'] },
+{ id:'pp_bom_trabalho', peso:4, termos:['boa sorte','bom trabalho','bom descanso','bom feriado','boas festas','feliz natal','feliz ano novo'],
+  falas:['Obrigada, para você também 😊 Que dê tudo certo aí.'] }
+];
+
+
+/* ╔═══════════════════════════════════════════════════════════════════╗
    ║  07 · REGRAS                                                      ║
    ║  As dez regras invioláveis viram funções. Algumas deixaram de     ║
    ║  precisar de código: não existe preço nem prazo no sistema, então ║
@@ -1809,7 +2294,7 @@ const INTENCOES = [
   { id:'suporte',     peso:9,  termos:['sistema caiu','site caiu','site fora do ar','esta fora do ar','deu erro','nao esta funcionando','parou de funcionar','ja sou cliente','voces fizeram meu','meu sistema travou'] },
   { id:'sensivel',    peso:9,  termos:[] },
 
-  { id:'foratema',    peso:7,  termos:['receita de','quem ganhou','escalacao','time de futebol','previsao do tempo','significado da vida','me ajuda com a licao','tema de casa','qual e a capital','quanto e','resolva','traduza','escreva um poema','conte uma piada','me conta uma piada','uma piada','piada','me faz um poema'] },
+  { id:'foratema',    peso:7,  termos:['receita de','quem ganhou','escalacao','time de futebol','previsao do tempo','significado da vida','me ajuda com a licao','tema de casa','qual e a capital','quanto e','resolva','traduza','escreva um poema','me faz um poema','faca um poema','me ajuda com a redacao'] },
 
   { id:'preco',       peso:6,  termos:['quanto custa','qual o valor','quanto fica','quanto sai','orcamento','preco','valores','investimento','quanto vou pagar','custa caro'] },
   { id:'prazo',       peso:6,  termos:['quanto tempo','em quanto tempo','qual o prazo','demora','quando fica pronto','prazo de entrega'] },
@@ -1863,8 +2348,9 @@ const INTENCOES = [
   { id:'nao',         peso:1,  termos:['nao','agora nao','depois','deixa pra la','nao precisa'] }
 ];
 
-// os assuntos sem dado disputam pontuação como qualquer outra intenção
-for(const grupo of SEM_DADO) INTENCOES.push({ id:grupo.id, peso:grupo.peso, termos:grupo.termos });
+// assuntos sem dado e conversa leve disputam pontuação como qualquer intenção
+for(const grupo of SEM_DADO)  INTENCOES.push({ id:grupo.id, peso:grupo.peso, termos:grupo.termos });
+for(const grupo of CONVERSA)  INTENCOES.push({ id:grupo.id, peso:grupo.peso, termos:grupo.termos });
 
 const MotorIntencoes = {
 
@@ -2007,14 +2493,25 @@ const MotorIntencoes = {
     return false;
   },
 
-  /** Segmento é detectado à parte: não é intenção, é dado. */
+  /**
+   * Segmento é detectado à parte: não é intenção, é dado.
+   * Vence a palavra-chave mais específica, não a primeira da lista —
+   * senão "ajuste de roupa" cairia em varejo por causa de "roupa".
+   */
   detectarSegmento(texto){
     const t = U.corrigir(texto);
     const fichas = t.trim().split(' ').filter(Boolean);
-    return SEGMENTOS.find(s => s.relacionadas.some(k => {
-      const chave = U.normalizar(k);
-      return this.casaTermo(t, chave) || this.casaAproximado(fichas, chave);
-    })) || null;
+    let melhor = null, forca = 0;
+    for(const seg of SEGMENTOS){
+      for(const k of seg.relacionadas){
+        const chave = U.normalizar(k);
+        const exato = this.casaTermo(t, chave);
+        if(!exato && !this.casaAproximado(fichas, chave)) continue;
+        const peso = chave.length + (exato ? 2 : 0);
+        if(peso > forca){ forca = peso; melhor = seg; }
+      }
+    }
+    return melhor;
   }
 };
 
@@ -2098,7 +2595,7 @@ const Redator = (() => {
 
   const BANCO = {
     saudacaoInicial:[
-      '{periodo}! Sou a IA da BHSAAS 👋\n\nSeja muito bem-vindo. Vou entender um pouco sobre a sua empresa e te mostrar onde a tecnologia costuma ajudar mais.\n\nMe conta: o que você faz?'
+      'Olá! Seja muito bem-vindo à BHSAAS 👋 Posso ajudar em quê?\n\nSe quiser falar direto com o Ryan, o botão verde do WhatsApp está aí no topo. Mas fica comigo primeiro 😄 eu já adianto bastante coisa.'
     ],
     saudacaoNoMeio:[
       '{periodo}{, nome}! 😊 Seja muito bem-vindo à BHSAAS. Espero que esteja tudo bem com você.',
@@ -2258,6 +2755,8 @@ const ESTADOS = {
 };
 
 const Motor = (() => {
+
+  const memoriaPapo = {};      // evita repetir a mesma piada duas vezes seguidas
 
   const ctx = {
     estado: ESTADOS.INICIO,
@@ -2499,10 +2998,36 @@ const Motor = (() => {
       return finalizar(saida);
     }
 
+    /* ── 4c. conversa leve: português, glossário e papo ────────────── */
+    const papo = CONVERSA.find(g => g.id === intencao.id);
+    if(papo){
+      Analytics.evento('conversa_leve', { id:papo.id });
+      Avatar.humor('happy', 1800);
+      saida.falas.push(U.sorteioSemRepetir(papo.falas, memoriaPapo, papo.id));
+      if(!ctx.dados.segmento || !ctx.dados.problema) seguirConversa(saida);
+      return finalizar(saida);
+    }
+
     /* ── 5. resposta a uma pergunta pendente ──────────────────────── */
     if(ctx.aguardando){
       const tratado = responderPendencia(texto, intencao, saida);
       if(tratado) return finalizar(saida);
+    }
+
+    /* ── 5b. conta e calendário ────────────────────────────────────── */
+    const conta = Calculadora.tentar(texto);
+    if(conta){
+      Analytics.evento('calculo');
+      Avatar.gestoDirigido('digita', 2600);
+      saida.falas.push(conta);
+      return finalizar(saida);
+    }
+    const quando = Agenda.tentar(texto);
+    if(quando){
+      Analytics.evento('data_hora');
+      saida.falas.push(quando);
+      if(!ctx.dados.segmento) seguirConversa(saida);
+      return finalizar(saida);
     }
 
     /* ── 6. avanço pela máquina de estados ────────────────────────── */
@@ -2618,6 +3143,14 @@ const Motor = (() => {
       return demonstrar(saida);
     }
 
+    if(pendencia === 'mandar'){
+      ctx.aguardando = null;
+      if(intencao.id === 'sim') return enviarAoRyan(saida);
+      saida.falas.push('Tranquilo 😊 Deixo o botão verde aqui em cima com tudo pronto — é só tocar quando quiser.');
+      saida.cartoes.push({ tipo:'whatsapp', url:linkWhatsApp() });
+      return true;
+    }
+
     if(pendencia === 'resumo'){
       ctx.aguardando = null;
       if(intencao.id === 'sim') return montarResumo(saida);
@@ -2707,10 +3240,25 @@ const Motor = (() => {
 
     saida.cartoes.push({ tipo:'resumo', texto:linhas.join('\n') });
     saida.falas.push(Redator.falar('conviteWhatsapp'));
-    saida.falas.push('Preparei também a mensagem para você mandar a ele — é só apertar enviar. Quem envia é você, eu não mando nada por aqui.');
-    saida.cartoes.push({ tipo:'whatsapp', url:linkWhatsApp() });
+    saida.falas.push('Já deixei a mensagem pronta com tudo isso' + (d.nome ? ', ' + d.nome : '') +
+                     '. **Vamos mandar para ele agora?**');
+    ctx.aguardando = 'mandar';
+    saida.chips.push({ rotulo:'Sim, pode mandar', icone:'🚀', acao:'enviar_ryan', destaque:true });
+    saida.chips.push({ rotulo:'Depois eu mando',  icone:'🕒', diz:'Depois eu mando.' });
     Avatar.humor('celebrating', 2800);
+    Analytics.marco('resumo_pronto_para_envio');
+    return true;
+  }
+
+  /** Fecho da conversa: entrega o resumo montado na mão do Ryan. */
+  function enviarAoRyan(saida){
+    ctx.estado = ESTADOS.ENCERRAMENTO;
     Analytics.marco('link_whatsapp_gerado');
+    Analytics.marco('enviou_ao_ryan');
+    saida.falas.push('Feito 🚀 Abri a conversa com o Ryan e a mensagem já está montada com o seu resumo.\n\nÉ só apertar enviar por lá. Se não abrir sozinho, use o botão abaixo.');
+    saida.cartoes.push({ tipo:'whatsapp', url:linkWhatsApp() });
+    saida.falas.push('Foi ótimo conversar com você' + (ctx.dados.nome ? ', ' + ctx.dados.nome : '') + ' 😊 Qualquer coisa, é só voltar aqui.');
+    Avatar.humor('celebrating', 3000);
     return true;
   }
 
@@ -2795,6 +3343,7 @@ const Motor = (() => {
     const saida = { falas:[], cartoes:[], chips:[] };
     if(nome === 'modulos') return mostrarModulos();
     if(nome === 'resumo'){ montarResumo(saida); return saida; }
+    if(nome === 'enviar_ryan'){ enviarAoRyan(saida); return saida; }
     if(nome === 'whatsapp_direto'){ ctx.pediuContato = true; return rotaWhatsApp(saida); }
     return saida;
   }
@@ -2839,6 +3388,7 @@ const UI = (() => {
     say.className = 'say';
     say.textContent = texto;
     wrap.appendChild(say);
+    say.dataset.bruto = texto;
     el.thread.appendChild(wrap);
     descer(true);
     return say;
@@ -2847,18 +3397,25 @@ const UI = (() => {
   /** revelação palavra a palavra, com a boca do avatar acompanhando */
   function revelar(texto, alvo){
     return new Promise(resolve => {
-      if(U.reduzido){ alvo.textContent = texto; descer(true); return resolve(); }
+      if(U.reduzido){ alvo.textContent = texto; realce(alvo); descer(true); return resolve(); }
       Avatar.setBase('speaking');
       const palavras = texto.split(/(\s+)/);
       let i = 0;
       (function passo(){
         i += 1 + Math.floor(Math.random()*2);
-        if(i >= palavras.length){ alvo.textContent = texto; descer(); return resolve(); }
+        if(i >= palavras.length){ alvo.textContent = texto; realce(alvo); descer(); return resolve(); }
         alvo.textContent = palavras.slice(0,i).join('');
         descer();
         setTimeout(passo, CFG.ritmo.msPorPalavra);
       })();
     });
+  }
+
+  /** **assim** vira negrito. Escapa antes, então nada de HTML injetado. */
+  function realce(el){
+    const bruto = el.textContent;
+    if(bruto.indexOf('**') < 0) return;
+    el.innerHTML = U.escapar(bruto).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
   }
 
   const FALAS_ANALISE = ['Analisando seu cenário...','Conectando as informações...','Organizando as oportunidades...'];
@@ -3202,7 +3759,8 @@ const Eventos = (() => {
     const texto = (bruto ?? el.input.value).trim().slice(0, 1200);
     if(!texto || ocupado) return;
 
-    if(!aberto){ aberto = true; document.body.classList.add('is-open'); Analytics.marco('primeira_mensagem'); }
+    abrirPainel();
+    if(!aberto){ aberto = true; Analytics.marco('primeira_mensagem'); }
 
     UI.limparChips();
     UI.turno('user', texto);
@@ -3245,6 +3803,16 @@ const Eventos = (() => {
     Avatar.setBase('idle');
   }
 
+  /**
+   * Encolhe a vitrine e devolve a tela para a conversa. Roda no foco do
+   * campo, e não só no primeiro envio: quem está prestes a escrever já
+   * precisa do espaço, não depois.
+   */
+  function abrirPainel(){
+    if(!document.body.classList.contains('is-open'))
+      document.body.classList.add('is-open');
+  }
+
   function aoDigitar(){
     el.input.style.height = 'auto';
     el.input.style.height = Math.min(el.input.scrollHeight, 132) + 'px';
@@ -3258,8 +3826,16 @@ const Eventos = (() => {
   function ligar(){
     el.send.addEventListener('click', () => enviar());
     el.input.addEventListener('input', aoDigitar);
-    el.input.addEventListener('focus', () => { if(!ocupado) Avatar.setBase('listening'); });
-    el.input.addEventListener('blur',  () => { if(!ocupado) Avatar.setBase('idle'); });
+    el.input.addEventListener('focus', () => {
+      abrirPainel();
+      document.body.classList.add('teclado');
+      if(!ocupado) Avatar.setBase('listening');
+      setTimeout(() => UI.descer(true), 320);
+    });
+    el.input.addEventListener('blur',  () => {
+      document.body.classList.remove('teclado');
+      if(!ocupado) Avatar.setBase('idle');
+    });
     el.input.addEventListener('keydown', e => {
       if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); enviar(); }
     });
@@ -3267,6 +3843,12 @@ const Eventos = (() => {
     el.chips.addEventListener('click', e => {
       const chip = e.target.closest('.chip');
       if(!chip) return;
+      // Abrir aqui, e não depois do await: fora do clique o navegador
+      // trata como pop-up e bloqueia.
+      if(chip.dataset.acao === 'enviar_ryan'){
+        try{ window.open(Motor.linkWhats(), '_blank', 'noopener'); }catch(err){}
+        Analytics.marco('clicou_whatsapp');
+      }
       UI.limparChips();
       if(chip.dataset.acao) return acao(chip.dataset.acao);
       if(chip.dataset.diz) return enviar(chip.dataset.diz);
@@ -3344,7 +3926,8 @@ const Dicas = (() => {
   function conferirWhats(){
     if(body.classList.contains('pode-whats')) return;
     if(!Motor.podeChamarRyan()) return;
-    waTop.href = Motor.linkWhats();
+    waTop.href = Motor.linkWhats();                    // agora leva o resumo junto
+    U.$('waRotulo').textContent = 'Enviar meu resumo';
     body.classList.add('pode-whats');
     Avatar.gestoDirigido('aponta');
   }
@@ -3417,6 +4000,23 @@ const Movimento = (() => {
    ║  18 · INICIALIZAÇÃO                                               ║
    ╚═══════════════════════════════════════════════════════════════════╝ */
 (function iniciar(){
+  /* No iOS o teclado cobre a página sem alterar 100dvh: o campo de
+     escrita fica embaixo do teclado. O visualViewport dá a altura real. */
+  (function medirJanela(){
+    const vv = window.visualViewport;
+    const ajustar = () => {
+      const alt = vv ? vv.height : window.innerHeight;
+      document.documentElement.style.setProperty('--vh', Math.round(alt) + 'px');
+      if(vv && vv.offsetTop > 0) window.scrollTo(0, 0);
+    };
+    ajustar();
+    if(vv){
+      vv.addEventListener('resize', ajustar);
+      vv.addEventListener('scroll', ajustar);
+    }
+    addEventListener('orientationchange', () => setTimeout(ajustar, 240));
+  })();
+
   Avatar.iniciar();
   Eventos.ligar();
   Dicas.iniciar();
